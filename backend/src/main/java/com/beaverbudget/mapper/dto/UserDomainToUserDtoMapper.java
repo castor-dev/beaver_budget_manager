@@ -4,6 +4,7 @@ import com.beaverbudget.mapper.GenericMapper;
 import com.beaverbudget.model.User;
 import com.beaverbudget.model.UserDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserDomainToUserDtoMapper extends GenericMapper<User, UserDTO> {

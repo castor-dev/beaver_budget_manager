@@ -17,4 +17,7 @@ public interface UserDTOtoUserDomainMapper extends GenericMapper<UserDTO, User> 
   default Class<User> getTargetType() {
     return User.class;
   }
+
+  @Override
+  User map(UserDTO source);
 }
