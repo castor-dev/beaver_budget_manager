@@ -1,4 +1,6 @@
 package com.beaverbudget.controller;
 
-public class TransactionController {
+import com.beaverbudget.api.TransactionsApi;
+
+public class TransactionController implements TransactionsApi{
 }

@@ -1,5 +1,6 @@
 package com.beaverbudget.service;
 
+import com.beaverbudget.exceptions.FeatureNotImplementedException;
 import com.beaverbudget.model.User;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface UserService {
      * @return new user
      */
     default User createUser(User user){
-        throw new UnsupportedOperationException("Method not implemented");
+        throw new FeatureNotImplementedException("UserService.createUser not implemented");
     }
 
     /**
@@ -21,7 +22,7 @@ public interface UserService {
      * @return  user
      */
     default User findUserById(Integer userId){
-        throw new UnsupportedOperationException("Method not implemented");
+        throw new FeatureNotImplementedException("UserService.findUserById not implemented");
     }
 
     /**
@@ -29,7 +30,7 @@ public interface UserService {
      * @return list of all users
      */
     default List<User> findAllUsers() {
-        throw new UnsupportedOperationException("Method not implemented");
+        throw new FeatureNotImplementedException("UserService.findAllUsers not implemented");
     }
 
     /**
@@ -39,7 +40,7 @@ public interface UserService {
      * @return updated user
      */
     default User updateUserById(Integer userId, User user){
-        throw new UnsupportedOperationException("Method not implemented");
+        throw new FeatureNotImplementedException("UserService.updateUserById not implemented");
     }
 
     /**
@@ -47,7 +48,7 @@ public interface UserService {
      * @param userId user id
      */
     default void deleteUser(Integer userId){
-        throw new UnsupportedOperationException("Method not implemented");
+        throw new FeatureNotImplementedException("UserService.deleteUser not implemented");
     }
 
 }
