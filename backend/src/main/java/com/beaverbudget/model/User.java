@@ -1,21 +1,20 @@
 package com.beaverbudget.model;
 
+import java.time.LocalDateTime;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
+/**
+ * User model class
+ * */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-/**
- * User model class
- */
 public class User {
-    private Integer id;
-    private String name;
-    private String login;
-    private String password;
-    private LocalDateTime passwordExpireDate;
+  private Integer id;
+  private String name;
+  private String login;
+  private String password;
+  private LocalDateTime passwordExpireDate;
 }

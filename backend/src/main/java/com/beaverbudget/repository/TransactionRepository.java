@@ -1,4 +1,3 @@
 package com.beaverbudget.repository;
 
-public interface TransactionRepository {
-}
+public interface TransactionRepository {}

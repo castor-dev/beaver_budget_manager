@@ -8,13 +8,13 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UserDTOtoUserDomainMapper extends GenericMapper<UserDTO, User> {
 
-    @Override
-    default Class<UserDTO> getSourceType(){
-        return UserDTO.class;
-    }
+  @Override
+  default Class<UserDTO> getSourceType() {
+    return UserDTO.class;
+  }
 
-    @Override
-    default Class<User> getTargetType(){
-        return User.class;
-    }
+  @Override
+  default Class<User> getTargetType() {
+    return User.class;
+  }
 }

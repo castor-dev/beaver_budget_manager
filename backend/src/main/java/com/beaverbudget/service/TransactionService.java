@@ -1,6 +1,3 @@
 package com.beaverbudget.service;
 
-public interface TransactionService {
-
-
-}
+public interface TransactionService {}

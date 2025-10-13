@@ -1,4 +1,3 @@
 package com.beaverbudget.controller;
 
-public class AccountController {
-}
+public class AccountController {}

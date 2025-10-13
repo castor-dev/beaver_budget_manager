@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  }
 
-    @ExceptionHandler(FeatureNotImplementedException.class)
-    public ResponseEntity<ErrorMessage> handleFeatureNotAvailable(FeatureNotImplementedException ex){
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(new ErrorMessage(ex.getMessage()));
-    }
-
+  @ExceptionHandler(FeatureNotImplementedException.class)
+  public ResponseEntity<ErrorMessage> handleFeatureNotAvailable(FeatureNotImplementedException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+        .body(new ErrorMessage(ex.getMessage()));
+  }
 }
-
-
