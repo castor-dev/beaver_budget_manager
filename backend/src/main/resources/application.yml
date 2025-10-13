@@ -4,6 +4,13 @@ server:
 spring:
   application:
     name: beaver-backend
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    url: /openapi.yaml
+    path: /swagger-ui.html
     
 management:
   endpoints:
