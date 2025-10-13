@@ -64,6 +64,21 @@
       <artifactId>jackson-databind-nullable</artifactId>
       <version>0.2.6</version>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>1.5.5.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct-processor</artifactId>
+      <version>1.5.5.Final</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -93,15 +108,42 @@
               <generatorName>spring</generatorName>
               <apiPackage>com.beaverbudget.api</apiPackage>
               <modelPackage>com.beaverbudget.model</modelPackage>
+              <modelNameSuffix>DTO</modelNameSuffix>
               <output>${project.build.directory}/generated-sources</output>
+              <globalProperties>
+                <api>false</api>
+                <model>true</model>
+              </globalProperties>
               <configOptions>
+                <interfaceOnly>true</interfaceOnly>
                 <useJakartaEe>true</useJakartaEe>
                 <nullableReferenceTypes>false</nullableReferenceTypes>
-                <generateTests>false</generateTests>
               </configOptions>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>${java.version}</source>  <!-- or your Java version -->
+          <target>${java.version}</target>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>1.5.5.Final</version>
+            </path>
+            <!-- Include Lombok if you're using it -->
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.32</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
       </plugin>
     </plugins>
   </build>
