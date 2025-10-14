@@ -488,7 +488,7 @@ components:
           type: number
         currency:
           type: string
-        userId:
+        ownerId:
           type: integer
     Transaction:
       type: object
