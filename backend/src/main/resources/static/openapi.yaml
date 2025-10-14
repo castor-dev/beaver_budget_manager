@@ -378,6 +378,23 @@ paths:
         - transaction
       summary: List all transactions
       operationId: listTransactions
+      parameters:
+        - name: from
+          in: query
+          description: Start date for filtering (inclusive)
+          required: false
+          schema:
+            type: string
+            format: date
+            example: '2025-01-01'
+        - name: to
+          in: query
+          description: End date for filtering (inclusive)
+          required: false
+          schema:
+            type: string
+            format: date
+            example: '2025-01-31'
       responses:
         '200':
           description: A list of transactions
