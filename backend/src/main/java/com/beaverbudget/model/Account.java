@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class Account {
     private Integer id;
     private String name;
-    private User owner;
+    private Integer ownerId;
     private BigDecimal balance;
     private String currency;
 }
