@@ -21,6 +21,6 @@ public interface TransactionService {
     }
 
     default void deleteTransaction(Integer transactionId){
-        throw new FeatureNotImplementedException("AccountService.deleteAccountTransaction not implemented");
+        throw new FeatureNotImplementedException("AccountService.deleteTransaction not implemented");
     }
 }
