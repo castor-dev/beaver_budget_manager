@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @Builder
 public class Transaction {
     private Integer id;
-    private BigDecimal amount;
-    private String type;
     private String description;
+    private BigDecimal amount;
     private Integer accountId;
     private Boolean planned;
+    private Transaction parentTransaction;
 }
