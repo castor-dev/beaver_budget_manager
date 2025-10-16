@@ -33,9 +33,5 @@ management:
     tags:
       application: ${spring.application.name}
 
-logging:
-  level:
-    root: INFO
-    org.flywaydb: DEBUG
-    org.springframework.boot.autoconfigure.flyway: TRACE
-    org.springframework.jdbc.datasource: DEBUG
+app:
+  password-expiration-days: 90
