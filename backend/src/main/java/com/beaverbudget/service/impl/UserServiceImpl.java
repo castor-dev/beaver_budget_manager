@@ -6,6 +6,7 @@ import com.beaverbudget.model.User;
 import com.beaverbudget.persistence.UserPersistenceService;
 import com.beaverbudget.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,10 +18,17 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final Integer expirationDays = 90;
     private final UserPersistenceService userPersistenceService;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public User createUser(User user) {
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+        LocalDateTime passwordExpirationDate = LocalDateTime.now().plusDays(expirationDays);
+        user.setPasswordExpireDate(passwordExpirationDate);
         return userPersistenceService.createUser(user);
     }
 
@@ -51,7 +59,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(email);
         }
         if (nonNull(user.getPassword())) {
-            LocalDateTime newPasswordExpireDate = LocalDateTime.now().plusMonths(3);
+            LocalDateTime newPasswordExpireDate = LocalDateTime.now().plusMonths(expirationDays);
             existingUser.setPassword(user.getPassword());
             existingUser.setPasswordExpireDate(newPasswordExpireDate);
         }

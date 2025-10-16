@@ -4,7 +4,6 @@ CREATE TABLE accounts (
     owner_id        INTEGER NOT NULL,
     balance         NUMERIC(15, 2) DEFAULT 0.00,
     currency        VARCHAR(10),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_account_user
         FOREIGN KEY (owner_id) REFERENCES users(id)
