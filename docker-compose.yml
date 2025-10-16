@@ -1,4 +1,18 @@
 services:
+  postgres:
+    image: postgres
+    container_name: beaver-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=beaver_budget_db
+      - POSTGRES_USER=beaver_user
+      - POSTGRES_PASSWORD=beaver_pass
+    volumes:
+      - beaver-postgres-data:/var/lib/postgresql/data
+    networks:
+      - beaver-net
+
   backend:
     build: ./backend
     container_name: beaver-backend
@@ -6,6 +20,8 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - postgres
     networks:
       - beaver-net
 
@@ -31,6 +47,10 @@ services:
     image: grafana/grafana
     ports:
       - "3000:3000"
+
 networks:
   beaver-net:
     driver: bridge
+
+volumes:
+  beaver-postgres-data: {}
