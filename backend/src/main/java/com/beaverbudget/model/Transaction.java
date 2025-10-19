@@ -16,4 +16,5 @@ public class Transaction {
     private Integer accountId;
     private Boolean planned;
     private Transaction parentTransaction;
+    private TransactionType transactionType;
 }
