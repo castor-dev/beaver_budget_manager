@@ -15,6 +15,6 @@ public class User {
   private Integer id;
   private String name;
   private String email;
-  private String password;
+  private String passwordHash;
   private LocalDateTime passwordExpireDate;
 }

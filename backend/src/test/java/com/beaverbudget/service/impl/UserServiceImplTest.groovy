@@ -4,6 +4,7 @@ import com.beaverbudget.exceptions.InvalidResourceException
 import com.beaverbudget.exceptions.ResourceNotFoundException
 import com.beaverbudget.model.User
 import com.beaverbudget.persistence.UserPersistenceService
+import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -11,7 +12,8 @@ import java.time.LocalDateTime
 class UserServiceImplTest extends Specification {
 
     def userPersistenceService = Mock(UserPersistenceService)
-    def service = new UserServiceImpl(userPersistenceService)
+    def passwordEncoder = Mock(PasswordEncoder)
+    def service = new UserServiceImpl(userPersistenceService, passwordEncoder)
 
     def "should create user"() {
         given:
@@ -106,7 +108,7 @@ class UserServiceImplTest extends Specification {
     def "should update password and set expiry"() {
         given:
         def existing = new User(id: 1)
-        def update = new User(password: "newPass", passwordExpireDate: LocalDateTime.now().plusMonths(3))
+        def update = new User(passwordHash: "newPass", passwordExpireDate: LocalDateTime.now().plusMonths(3))
         userPersistenceService.findUserById(1) >> Optional.of(existing)
         userPersistenceService.saveUser(_ as User) >> update
 
@@ -114,8 +116,21 @@ class UserServiceImplTest extends Specification {
         def result = service.updateUserById(1, update)
 
         then:
-        result.password == "newPass"
+        result.passwordHash == "newPass"
         result.passwordExpireDate.isAfter(LocalDateTime.now())
+    }
+
+    def "should hash password"(){
+        given:
+        def hashedPassword = "hashedPassword"
+        def user = new User(id: 1, passwordHash: "password")
+
+        when:
+        def createUser = service.createUser(user)
+
+        then:
+        1 * passwordEncoder.encode(_) >> hashedPassword
+        1 * userPersistenceService.createUser(_)
     }
 
     def "should delete user"() {
