@@ -20,4 +20,5 @@ public interface AccountDomainToAccountDTOMapper extends GenericMapper<Account, 
 
     @Override
     AccountDTO map(Account source);
+
 }

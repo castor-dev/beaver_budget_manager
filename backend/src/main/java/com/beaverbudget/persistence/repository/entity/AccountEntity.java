@@ -23,5 +23,4 @@ public class AccountEntity {
     @Column(length = 3, nullable = false)
     private String currency;
 
-
 }
