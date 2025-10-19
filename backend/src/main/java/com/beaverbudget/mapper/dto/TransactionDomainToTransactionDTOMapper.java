@@ -8,7 +8,6 @@ import com.beaverbudget.model.TransactionType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring")
 public interface TransactionDomainToTransactionDTOMapper extends GenericMapper<Transaction, TransactionDTO> {
