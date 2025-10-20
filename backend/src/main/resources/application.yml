@@ -9,6 +9,13 @@ spring:
     username: beaver_user
     password: beaver_pass
     driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
   flyway:
     enabled: true
     schemas: beaver_budget
