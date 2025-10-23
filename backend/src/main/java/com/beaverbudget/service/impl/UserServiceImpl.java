@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(hashedPassword);
         LocalDateTime passwordExpirationDate = LocalDateTime.now().plusDays(expirationDays);
         user.setPasswordExpireDate(passwordExpirationDate);
-        return userPersistenceService.createUser(user);
+        return userPersistenceService.saveUser(user);
     }
 
     @Override
@@ -57,11 +57,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setName(user.getName());
         }
         if (nonNull(user.getEmail())) {
-            String email = user.getEmail();
-            userPersistenceService.findUserByEmail(email).ifPresent(u -> {
-                throw new InvalidResourceException("User with email " + email + "already exists");
-            });
-            existingUser.setEmail(email);
+            existingUser.setEmail(user.getEmail());
         }
         if (nonNull(user.getPasswordHash())) {
             String hashedPassword = passwordEncoder.encode(user.getPasswordHash());

@@ -8,10 +8,14 @@ import com.beaverbudget.model.Transaction;
 import com.beaverbudget.model.TransactionDTO;
 
 import com.beaverbudget.service.AccountService;
+import com.beaverbudget.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Controller for account resource requests
@@ -20,6 +24,7 @@ import java.util.List;
 public class AccountController implements AccountsApi {
 
     private final AccountService accountService;
+    private final TransactionService transactionService;
     private final MapperProvider mapperProvider;
 
     /**
@@ -27,8 +32,9 @@ public class AccountController implements AccountsApi {
      * @param accountService {@link AccountService}
      * @param mapperProvider {@link MapperProvider}
      */
-    public AccountController(AccountService accountService, MapperProvider mapperProvider) {
+    public AccountController(AccountService accountService, TransactionService transactionService, MapperProvider mapperProvider) {
         this.accountService = accountService;
+        this.transactionService = transactionService;
         this.mapperProvider = mapperProvider;
     }
 
@@ -68,25 +74,48 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<TransactionDTO> createAccountTransaction(Integer accountId, TransactionDTO transactionDTO) {
         Transaction transaction = mapperProvider.map(transactionDTO, Transaction.class);
-        Transaction accountTransaction = accountService.createAccountTransaction(accountId, transaction);
+        Transaction accountTransaction = transactionService.createTransaction(transaction);
         return ResponseEntity.ok(mapperProvider.map(accountTransaction, TransactionDTO.class));
     }
 
     @Override
     public ResponseEntity<TransactionDTO> getAccountTransactionById(Integer accountId, Integer transactionId) {
-        Transaction accountTransaction = accountService.findAccountTransactionById(accountId, transactionId);
+        Transaction accountTransaction = transactionService.findTransactionById(transactionId);
         return ResponseEntity.ok(mapperProvider.map(accountTransaction, TransactionDTO.class));
     }
 
     @Override
-    public ResponseEntity<TransactionDTO> updateAccountTransaction(Integer accountId, Integer transactionId, TransactionDTO transactionDTO) {
-        Transaction transaction = accountService.updateAccountTransaction(accountId, transactionId, mapperProvider.map(transactionDTO, Transaction.class));
+    public ResponseEntity<TransactionDTO> updateAccountTransaction(Integer accountId,
+                                                                   Integer transactionId,
+                                                                   TransactionDTO transactionDTO) {
+        Transaction transaction = transactionService.updateTransaction(transactionId, mapperProvider.map(transactionDTO, Transaction.class));
         return ResponseEntity.ok(mapperProvider.map(transaction, TransactionDTO.class));
     }
 
     @Override
-    public ResponseEntity<Void> deleteAccountTransaction(Integer accountId, Integer transactionId) {
-        accountService.deleteAccountTransaction(accountId, transactionId);
+    public ResponseEntity<Void> deleteAccountTransaction(Integer accountId,
+                                                         Integer transactionId) {
+        transactionService.deleteTransaction(transactionId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<List<TransactionDTO>> listAccountTransactions(Integer accountId,
+                                                                        OffsetDateTime from,
+                                                                        OffsetDateTime to) {
+        LocalDateTime fromLocalDateTime = Objects.nonNull(from) ? from.toLocalDateTime() : null;
+        LocalDateTime toLocalDateTime = Objects.nonNull(to) ? from.toLocalDateTime() : null;
+        return ResponseEntity.ok(transactionService.findAccountTransactions(accountId, fromLocalDateTime, toLocalDateTime).stream()
+                .map(transaction ->  mapperProvider.map(transaction, TransactionDTO.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<TransactionDTO> executePlannedAccountTransaction(Integer accountId,
+                                                                           Integer transactionId,
+                                                                           TransactionDTO transactionDTO) {
+        Transaction transaction = mapperProvider.map(transactionDTO, Transaction.class);
+        Transaction plannedTransaction = transactionService.executePlannedTransaction(transactionId, transaction);
+        return ResponseEntity.ok(mapperProvider.map(plannedTransaction, TransactionDTO.class));
     }
 }

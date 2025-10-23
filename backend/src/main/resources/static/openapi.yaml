@@ -245,16 +245,16 @@ paths:
           required: false
           schema:
             type: string
-            format: date
-            example: '2025-01-01'
+            format: date-time
+            example: '2025-01-01T10:30:00'
         - name: to
           in: query
           description: End date for filtering (inclusive)
           required: false
           schema:
             type: string
-            format: date
-            example: '2025-01-31'
+            format: date-time
+            example: '2025-01-01T10:30:00'
       responses:
         '200':
           description: A list of account transactions
@@ -270,7 +270,7 @@ paths:
       tags:
         - accountTransaction
       summary: Executes the planned transaction, creating an actual one
-      operationId: postExecutePlannedAccountTransaction
+      operationId: executePlannedAccountTransaction
       parameters:
         - name: accountId
           in: path
@@ -385,16 +385,16 @@ paths:
           required: false
           schema:
             type: string
-            format: date
-            example: '2025-01-01'
+            format: date-time
+            example: '2025-01-01T10:30:00'
         - name: to
           in: query
           description: End date for filtering (inclusive)
           required: false
           schema:
             type: string
-            format: date
-            example: '2025-01-31'
+            format: date-time
+            example: '2025-01-01T10:30:00'
       responses:
         '200':
           description: A list of transactions
@@ -502,7 +502,7 @@ components:
           enum: [INCOME, EXPENSE]
         date:
           type: string
-          format: date
+          format: date-time
         description:
           type: string
         accountId:

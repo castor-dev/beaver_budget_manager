@@ -18,4 +18,9 @@ public class GlobalExceptionAdvice {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
         .body(new ErrorMessage(ex.getMessage()));
   }
+
+  @ExceptionHandler(InvalidResourceException.class)
+    public ResponseEntity<ErrorMessage> handleInvalidResourceException(InvalidResourceException ex){
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorMessage(ex.getMessage()));
+  }
 }

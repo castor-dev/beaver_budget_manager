@@ -8,8 +8,10 @@ import com.beaverbudget.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class TransactionController implements TransactionsApi {
@@ -35,14 +37,14 @@ public class TransactionController implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<List<TransactionDTO>> listTransactions(LocalDate from, LocalDate to) {
-
-        List<TransactionDTO> transactionDTOList = transactionService.findTransactions(from, to).stream()
+    public ResponseEntity<List<TransactionDTO>> listTransactions(OffsetDateTime from, OffsetDateTime to) {
+        LocalDateTime fromLocalDateTime = Objects.nonNull(from) ? from.toLocalDateTime() : null;
+        LocalDateTime toLocalDateTime = Objects.nonNull(to) ? from.toLocalDateTime() : null;
+        List<TransactionDTO> transactionDTOList = transactionService.findTransactions(fromLocalDateTime, toLocalDateTime).stream()
                 .map(transaction -> mapperProvider.map(transaction, TransactionDTO.class))
                 .toList();
         return ResponseEntity.ok(transactionDTOList);
     }
-
 
     @Override
     public ResponseEntity<Void> deleteTransaction(Integer transactionId) {

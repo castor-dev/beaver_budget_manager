@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString(exclude = "account")
 @Entity
-@Table(name = "transaction")
+@Table(name = "transactions")
 public class TransactionEntity {
 
     @Id
@@ -32,8 +32,7 @@ public class TransactionEntity {
 
     @Column(nullable = false)
     private LocalDateTime date;
-
-    @Column(length = 255)
+    @Column
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

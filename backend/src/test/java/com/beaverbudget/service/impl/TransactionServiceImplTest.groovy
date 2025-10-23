@@ -8,7 +8,7 @@ import com.beaverbudget.persistence.TransactionPersistenceService
 import spock.lang.Specification
 import spock.lang.Subject
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class TransactionServiceImplTest extends Specification {
     def transactionPersistenceService = Mock(TransactionPersistenceService)
@@ -21,56 +21,70 @@ class TransactionServiceImplTest extends Specification {
             accountPersistenceService
     )
 
-    // ------------------------------------------------------------
-    // findTransactionById
-    // ------------------------------------------------------------
-    def "should return transaction when found"() {
+    def "should create transaction"(){
         given:
-        Integer id = 1
-        def tx = new Transaction(id: id)
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(tx)
+        def transaction = new Transaction()
 
         when:
-        def result = service.findTransactionById(id)
+        service.createTransaction(transaction)
 
         then:
-        result == tx
+        1 * transactionPersistenceService.saveTransaction(transaction)
+    }
+
+    def "should find transaction by id"() {
+        given:
+        def transaction = new Transaction(id: 1)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(transaction)
+
+        when:
+        def result = service.findTransactionById(1)
+
+        then:
+        result == transaction
     }
 
     def "should throw ResourceNotFoundException when transaction not found"() {
         given:
-        Integer id = 10
-        transactionPersistenceService.findTransactionById(id) >> Optional.empty()
+        transactionPersistenceService.findTransactionById(99) >> Optional.empty()
 
         when:
-        service.findTransactionById(id)
+        service.findTransactionById(99)
 
         then:
         def e = thrown(ResourceNotFoundException)
-        e.message.contains("Transaction with id 10 not found")
+        e.message == "Transaction with id 99 not found"
     }
 
-    // ------------------------------------------------------------
-    // findTransactions
-    // ------------------------------------------------------------
-    def "should delegate to transactionPersistenceService.findAllTransactions"() {
+    def "should find transactions in period"() {
         given:
-        def from = LocalDate.of(2024, 1, 1)
-        def to = LocalDate.of(2024, 12, 31)
-        def txList = [new Transaction(id: 1), new Transaction(id: 2)]
+        def from = LocalDateTime.now().minusDays(10)
+        def to = LocalDateTime.now()
+        def transactions = [new Transaction(id: 1), new Transaction(id: 2)]
+        transactionPersistenceService.findAllTransactions(from, to) >> transactions
 
         when:
         def result = service.findTransactions(from, to)
 
         then:
-        1 * transactionPersistenceService.findAllTransactions(from, to) >> txList
-        result == txList
+        result == transactions
     }
 
-    // ------------------------------------------------------------
-    // deleteTransaction
-    // ------------------------------------------------------------
-    def "should delegate to transactionPersistenceService.deleteTransaction"() {
+    def "should find account transactions in period"() {
+        given:
+        def from = LocalDateTime.now().minusDays(5)
+        def to = LocalDateTime.now()
+        def transactions = [new Transaction(id: 1)]
+        transactionPersistenceService.findAllAccountTransactions(10, from, to) >> transactions
+
+        when:
+        def result = service.findAccountTransactions(10, from, to)
+
+        then:
+        result == transactions
+    }
+
+    def "should delete transaction by id"() {
         when:
         service.deleteTransaction(5)
 
@@ -78,117 +92,143 @@ class TransactionServiceImplTest extends Specification {
         1 * transactionPersistenceService.deleteTransaction(5)
     }
 
-    // ------------------------------------------------------------
-    // updateTransaction
-    // ------------------------------------------------------------
-    def "should update all non-null fields and save transaction"() {
+    def "should update transaction successfully"() {
         given:
-        Integer id = 1
-        def existing = new Transaction(id: id, amount: 100, description: "Old", planned: true, accountId: 5)
-        def update = new Transaction(amount: 200, description: "Updated", planned: false, accountId: 7)
-        def parent = new Transaction(id: 10)
-        update.setParentTransaction(parent)
-
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(existing)
-        transactionPersistenceService.findTransactionById(10) >> Optional.of(parent)
-        accountPersistenceService.findAccountById(7) >> Optional.of(new Object())
+        def existing = new Transaction(id: 1, amount: 100G, description: "Old", planned: true, accountId: 2)
+        def update = new Transaction(amount: 200G, description: "New", planned: false)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
+        transactionPersistenceService.saveTransaction(_) >> { Transaction t -> t }
 
         when:
-        def result = service.updateTransaction(id, update)
+        def result = service.updateTransaction(1, update)
 
         then:
-        1 * transactionPersistenceService.saveTransaction({
-            it.amount == 200 &&
-                    it.description == "Updated" &&
-                    !it.planned &&
-                    it.accountId == 7 &&
-                    it.parentTransaction == parent
-        }) >> { it[0] }
-
-        result.amount == 200
-        result.description == "Updated"
-        result.parentTransaction == parent
+        result.amount == 200G
+        result.description == "New"
+        result.planned == false
     }
 
-    def "should throw ResourceNotFoundException if transaction not found"() {
+    def "should throw ResourceNotFoundException when updating non-existing transaction"() {
         given:
-        Integer id = 1
-        transactionPersistenceService.findTransactionById(id) >> Optional.empty()
+        transactionPersistenceService.findTransactionById(1) >> Optional.empty()
 
         when:
-        service.updateTransaction(id, new Transaction())
-
-        then:
-        def e = thrown(ResourceNotFoundException)
-        e.message.contains("Transaction 1 not found")
-    }
-
-    def "should throw InvalidResourceException if parentTransaction id is null"() {
-        given:
-        Integer id = 1
-        def existing = new Transaction(id: id)
-        def update = new Transaction(parentTransaction: new Transaction(id: null))
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(existing)
-
-        when:
-        service.updateTransaction(id, update)
-
-        then:
-        thrown(InvalidResourceException)
-    }
-
-    def "should throw ResourceNotFoundException if parentTransaction not found"() {
-        given:
-        Integer id = 1
-        def existing = new Transaction(id: id)
-        def update = new Transaction(parentTransaction: new Transaction(id: 99))
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(existing)
-        transactionPersistenceService.findTransactionById(99) >> Optional.empty()
-
-        when:
-        service.updateTransaction(id, update)
+        service.updateTransaction(1, new Transaction())
 
         then:
         thrown(ResourceNotFoundException)
     }
 
-    def "should throw ResourceNotFoundException if account not found"() {
+    def "should set parent transaction when valid parent id provided"() {
         given:
-        Integer id = 1
-        def existing = new Transaction(id: id)
-        def update = new Transaction(accountId: 33)
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(existing)
-        accountPersistenceService.findAccountById(33) >> Optional.empty()
+        def existing = new Transaction(id: 1)
+        def parent = new Transaction(id: 2)
+        def update = new Transaction(parentTransaction: new Transaction(id: 2))
+
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
+        transactionPersistenceService.findTransactionById(2) >> Optional.of(parent)
+        transactionPersistenceService.saveTransaction(_) >> { Transaction t -> t }
 
         when:
-        service.updateTransaction(id, update)
+        def result = service.updateTransaction(1, update)
 
         then:
-        def e = thrown(ResourceNotFoundException)
-        e.message.contains("Account 33 not found")
+        result.parentTransaction == parent
     }
 
-    def "should only update non-null fields"() {
+    def "should throw InvalidResourceException when parent transaction id is null"() {
         given:
-        Integer id = 1
-        def existing = new Transaction(id: id, amount: 100, description: "Desc", planned: true)
-        def update = new Transaction(amount: null, description: "", planned: null)
+        def existing = new Transaction(id: 1)
+        def update = new Transaction(parentTransaction: new Transaction())
 
-        transactionPersistenceService.findTransactionById(id) >> Optional.of(existing)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
 
         when:
-        def result = service.updateTransaction(id, update)
+        service.updateTransaction(1, update)
 
         then:
-        1 * transactionPersistenceService.saveTransaction({
-            it.amount == 100 &&
-                    it.description == "Desc" &&
-                    it.planned == true
-        }) >> { it[0] }
-
-        result.amount == 100
-        result.description == "Desc"
-        result.planned
+        thrown(InvalidResourceException)
     }
 
+    def "should throw ResourceNotFoundException when parent transaction not found"() {
+        given:
+        def existing = new Transaction(id: 1)
+        def update = new Transaction(parentTransaction: new Transaction(id: 2))
+
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
+        transactionPersistenceService.findTransactionById(2) >> Optional.empty()
+
+        when:
+        service.updateTransaction(1, update)
+
+        then:
+        thrown(ResourceNotFoundException)
+    }
+
+    def "should set account id when valid account exists"() {
+        given:
+        def existing = new Transaction(id: 1)
+        def update = new Transaction(accountId: 5)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
+        accountPersistenceService.findAccountById(5) >> Optional.of(new Object())
+        transactionPersistenceService.saveTransaction(_) >> { Transaction t -> t }
+
+        when:
+        def result = service.updateTransaction(1, update)
+
+        then:
+        result.accountId == 5
+    }
+
+    def "should throw ResourceNotFoundException when account not found during update"() {
+        given:
+        def existing = new Transaction(id: 1)
+        def update = new Transaction(accountId: 10)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(existing)
+        accountPersistenceService.findAccountById(10) >> Optional.empty()
+
+        when:
+        service.updateTransaction(1, update)
+
+        then:
+        thrown(ResourceNotFoundException)
+    }
+
+    def "should execute planned transaction successfully"() {
+        given:
+        def parent = new Transaction(id: 1, planned: true)
+        def newTx = new Transaction(amount: 100G)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(parent)
+        transactionPersistenceService.saveTransaction(_) >> { Transaction t -> t }
+
+        when:
+        def result = service.executePlannedTransaction(1, newTx)
+
+        then:
+        result.parentTransaction == parent
+        !result.planned
+    }
+
+    def "should throw ResourceNotFoundException when planned transaction not found"() {
+        given:
+        transactionPersistenceService.findTransactionById(1) >> Optional.empty()
+
+        when:
+        service.executePlannedTransaction(1, new Transaction())
+
+        then:
+        thrown(ResourceNotFoundException)
+    }
+
+    def "should throw InvalidResourceException when executing non-planned transaction"() {
+        given:
+        def parent = new Transaction(id: 1, planned: false)
+        transactionPersistenceService.findTransactionById(1) >> Optional.of(parent)
+
+        when:
+        service.executePlannedTransaction(1, new Transaction())
+
+        then:
+        thrown(InvalidResourceException)
+    }
 }

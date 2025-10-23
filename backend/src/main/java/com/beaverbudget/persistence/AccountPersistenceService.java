@@ -8,10 +8,6 @@ import java.util.Optional;
 
 public interface AccountPersistenceService {
 
-    default Account createAccount(Account account ){
-        throw new FeatureNotImplementedException("AccountPersistenceService.createAccount not implemented");
-    }
-
     default Optional<Account> findAccountById(Integer accountId){
         throw new FeatureNotImplementedException("AccountPersistenceService.findAccountById not implemented");
     }

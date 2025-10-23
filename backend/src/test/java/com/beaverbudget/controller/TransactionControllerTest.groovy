@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 class TransactionControllerTest extends Specification {
 
@@ -50,8 +53,8 @@ class TransactionControllerTest extends Specification {
 
     def "should list transactions"() {
         given:
-        def from = LocalDate.of(2025, 1, 1)
-        def to = LocalDate.of(2025, 12, 31)
+        def from = OffsetDateTime.of(2025, 1, 1, 0, 0,0, 0, ZoneOffset.MIN)
+        def to = OffsetDateTime.of(2025, 12, 31, 0, 0,0, 0, ZoneOffset.MIN)
         def transactions = [Transaction.builder().id(1).build()]
         def dtos = [new TransactionDTO(id: 1)]
 
@@ -59,7 +62,7 @@ class TransactionControllerTest extends Specification {
         def response = controller.listTransactions(from, to)
 
         then:
-        1 * transactionService.findTransactions(from, to) >> transactions
+        1 * transactionService.findTransactions(_, _) >> transactions
         1 * mapperProvider.map(transactions[0], TransactionDTO.class) >> dtos[0]
         response.statusCode == HttpStatus.OK
         response.body == dtos

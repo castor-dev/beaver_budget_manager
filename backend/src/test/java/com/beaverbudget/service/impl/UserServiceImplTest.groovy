@@ -1,6 +1,6 @@
 package com.beaverbudget.service.impl
 
-import com.beaverbudget.exceptions.InvalidResourceException
+
 import com.beaverbudget.exceptions.ResourceNotFoundException
 import com.beaverbudget.model.User
 import com.beaverbudget.persistence.UserPersistenceService
@@ -23,7 +23,7 @@ class UserServiceImplTest extends Specification {
         def result = service.createUser(user)
 
         then:
-        1 * userPersistenceService.createUser(user) >> user
+        1 * userPersistenceService.saveUser(user) >> user
         result == user
     }
 
@@ -76,12 +76,11 @@ class UserServiceImplTest extends Specification {
         result.name == "NewName"
     }
 
-    def "should update user email if not duplicated"() {
+    def "should update user email"() {
         given:
         def existing = new User(id: 1, email: "old@mail.com")
         def update = new User(email: "new@mail.com")
         userPersistenceService.findUserById(1) >> Optional.of(existing)
-        userPersistenceService.findUserByEmail("new@mail.com") >> Optional.empty()
         userPersistenceService.saveUser(_ as User) >> update
 
         when:
@@ -89,20 +88,6 @@ class UserServiceImplTest extends Specification {
 
         then:
         result.email == "new@mail.com"
-    }
-
-    def "should throw InvalidResourceException if email already exists"() {
-        given:
-        def existing = new User(id: 1, email: "old@mail.com")
-        def update = new User(email: "duplicate@mail.com")
-        userPersistenceService.findUserById(1) >> Optional.of(existing)
-        userPersistenceService.findUserByEmail("duplicate@mail.com") >> Optional.of(new User(id: 2, email: "duplicate@mail.com"))
-
-        when:
-        service.updateUserById(1, update)
-
-        then:
-        thrown(InvalidResourceException)
     }
 
     def "should update password and set expiry"() {
@@ -130,7 +115,7 @@ class UserServiceImplTest extends Specification {
 
         then:
         1 * passwordEncoder.encode(_) >> hashedPassword
-        1 * userPersistenceService.createUser(_)
+        1 * userPersistenceService.saveUser(_)
     }
 
     def "should delete user"() {

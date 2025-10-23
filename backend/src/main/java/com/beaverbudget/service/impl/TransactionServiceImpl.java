@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -24,14 +24,24 @@ public class TransactionServiceImpl implements TransactionService {
     private final AccountPersistenceService accountPersistenceService;
 
     @Override
+    public Transaction createTransaction(Transaction transaction) {
+        return transactionPersistenceService.saveTransaction(transaction);
+    }
+
+    @Override
     public Transaction findTransactionById(Integer transactionId) {
         return transactionPersistenceService.findTransactionById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Transaction with id %s not found", transactionId)));
     }
 
     @Override
-    public List<Transaction> findTransactions(LocalDate from, LocalDate to) {
+    public List<Transaction> findTransactions(LocalDateTime from, LocalDateTime to) {
         return transactionPersistenceService.findAllTransactions(from, to);
+    }
+
+    @Override
+    public List<Transaction> findAccountTransactions(Integer accountId, LocalDateTime from, LocalDateTime to) {
+        return transactionPersistenceService.findAllAccountTransactions(accountId, from, to);
     }
 
     @Override
@@ -71,6 +81,21 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return transactionPersistenceService.saveTransaction(existingTransaction);
+    }
+
+    @Override
+    public Transaction executePlannedTransaction(Integer plannedTransactionId, Transaction transaction) {
+        Transaction parentTransaction = transactionPersistenceService.findTransactionById(plannedTransactionId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Transaction %s not found ", plannedTransactionId)));
+
+        if (!parentTransaction.getPlanned()) {
+            throw new InvalidResourceException("Not a planned transaction");
+        }
+
+        transaction.setParentTransaction(parentTransaction);
+        transaction.setPlanned(false);
+
+        return transactionPersistenceService.saveTransaction(transaction);
     }
 
 
