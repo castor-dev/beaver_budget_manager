@@ -43,7 +43,7 @@ class UserPersistenceServiceImplTest extends Specification {
         1 * userRepository.findByEmail("duplicate@mail.com") >> [new UserEntity()]
         0 * userRepository.save(_)
         def ex = thrown(InvalidResourceException)
-        ex.message == "user email already used"
+        ex.message == "user email not available"
     }
 
     def "should find user by id"() {

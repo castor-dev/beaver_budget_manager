@@ -6,14 +6,16 @@ import com.beaverbudget.model.AccountDTO
 import com.beaverbudget.model.Transaction
 import com.beaverbudget.model.TransactionDTO
 import com.beaverbudget.service.AccountService
+import com.beaverbudget.service.TransactionService
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
 class AccountControllerTest extends Specification {
 
     def accountService = Mock(AccountService)
+    def transactionService = Mock(TransactionService)
     def mapperProvider = Mock(MapperProvider)
-    def controller = new AccountController(accountService, mapperProvider)
+    def controller = new AccountController(accountService, transactionService, mapperProvider)
 
     def "should create account"(){
         given:
@@ -104,7 +106,7 @@ class AccountControllerTest extends Specification {
 
         then:
         1 * mapperProvider.map(transactionDto, Transaction.class) >> transaction
-        1 * accountService.createAccountTransaction(1, transaction) >> savedTransaction
+        1 * transactionService.createTransaction(transaction) >> savedTransaction
         1 * mapperProvider.map(savedTransaction, TransactionDTO.class) >> savedDto
         responseEntity.statusCode == HttpStatus.OK
         responseEntity.body == savedDto
@@ -119,7 +121,7 @@ class AccountControllerTest extends Specification {
         def responseEntity = controller.getAccountTransactionById(1, 1)
 
         then:
-        1 * accountService.findAccountTransactionById(1, 1) >> transaction
+        1 * transactionService.findTransactionById(1) >> transaction
         1 * mapperProvider.map(transaction, TransactionDTO.class) >> dto
         responseEntity.statusCode == HttpStatus.OK
         responseEntity.body == dto
@@ -137,7 +139,7 @@ class AccountControllerTest extends Specification {
 
         then:
         1 * mapperProvider.map(transactionDto, Transaction.class) >> transaction
-        1 * accountService.updateAccountTransaction(1, 1, transaction) >> updated
+        1 * transactionService.updateTransaction(1, transaction) >> updated
         1 * mapperProvider.map(updated, TransactionDTO.class) >> updatedDto
         responseEntity.statusCode == HttpStatus.OK
         responseEntity.body == updatedDto
@@ -148,7 +150,7 @@ class AccountControllerTest extends Specification {
         def responseEntity = controller.deleteAccountTransaction(1, 1)
 
         then:
-        1 * accountService.deleteAccountTransaction(1, 1)
+        1 * transactionService.deleteTransaction(1)
         responseEntity.statusCode == HttpStatus.NO_CONTENT
         responseEntity.body == null
     }
