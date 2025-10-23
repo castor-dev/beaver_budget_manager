@@ -8,12 +8,10 @@ import com.beaverbudget.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 public class TransactionController implements TransactionsApi {
