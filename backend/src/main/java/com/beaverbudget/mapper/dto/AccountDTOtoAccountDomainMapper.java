@@ -17,7 +17,4 @@ public interface AccountDTOtoAccountDomainMapper extends GenericMapper<AccountDT
     default Class<Account> getTargetType(){
         return Account.class;
     }
-
-    @Override
-    Account map(AccountDTO source);
 }

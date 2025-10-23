@@ -18,6 +18,4 @@ public interface UserDomainToUserDtoMapper extends GenericMapper<User, UserDTO> 
         return UserDTO.class;
     }
 
-    @Override
-    UserDTO map(User source);
 }

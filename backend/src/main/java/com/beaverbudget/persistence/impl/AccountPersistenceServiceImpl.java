@@ -5,6 +5,7 @@ import com.beaverbudget.model.Account;
 import com.beaverbudget.persistence.AccountPersistenceService;
 import com.beaverbudget.persistence.repository.AccountRepository;
 import com.beaverbudget.persistence.repository.entity.AccountEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class AccountPersistenceServiceImpl implements AccountPersistenceService 
 
     private final MapperProvider mapperProvider;
     private final AccountRepository accountRepository;
+
 
     public AccountPersistenceServiceImpl(MapperProvider mapperProvider, AccountRepository accountRepository) {
         this.mapperProvider = mapperProvider;
@@ -27,6 +29,7 @@ public class AccountPersistenceServiceImpl implements AccountPersistenceService 
         return Optional.ofNullable(mapperProvider.map(accountEntity, Account.class));
     }
 
+    @Transactional
     @Override
     public List<Account> findAllAccounts() {
         return accountRepository.findAll().stream()
@@ -35,6 +38,7 @@ public class AccountPersistenceServiceImpl implements AccountPersistenceService 
     }
 
 
+    @Transactional
     @Override
     public Account saveAccount(Account account) {
         AccountEntity accountEntity = mapperProvider.map(account, AccountEntity.class);

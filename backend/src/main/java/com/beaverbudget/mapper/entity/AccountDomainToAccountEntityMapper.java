@@ -17,5 +17,4 @@ public interface AccountDomainToAccountEntityMapper extends GenericMapper<Accoun
     default Class<AccountEntity> getTargetType(){
         return AccountEntity.class;
     }
-
 }
